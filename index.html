@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Robotspelet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #fff;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 560px;
+    padding: 8px;
+  }
+
+  /* --- Player info bars --- */
+  .player-info {
+    width: 100%;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .player-info .status {
+    font-size: 0.8em;
+    opacity: 0.7;
+    font-weight: 400;
+  }
+
+  .player-info.top {
+    transform: rotate(180deg);
+    background: rgba(231, 76, 60, 0.15);
+    border: 2px solid rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+
+  .player-info.bottom {
+    background: rgba(52, 152, 219, 0.15);
+    border: 2px solid rgba(52, 152, 219, 0.2);
+    color: #3498db;
+  }
+
+  .player-info.top.active {
+    background: rgba(231, 76, 60, 0.35);
+    border-color: #e74c3c;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+  }
+
+  .player-info.bottom.active {
+    background: rgba(52, 152, 219, 0.35);
+    border-color: #3498db;
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+  }
+
+  .robots-left {
+    display: flex;
+    gap: 4px;
+  }
+
+  .robots-left .pip {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    transition: all 0.3s;
+  }
+
+  .top .pip { background: #e74c3c; }
+  .top .pip.lost { background: rgba(231, 76, 60, 0.2); }
+  .bottom .pip { background: #3498db; }
+  .bottom .pip.lost { background: rgba(52, 152, 219, 0.2); }
+
+  /* --- Board --- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: min(calc(100vw - 16px), calc(100dvh - 160px), 500px);
+    height: min(calc(100vw - 16px), calc(100dvh - 160px), 500px);
+    border: 3px solid #2a2a4a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .cell.light { background: #1a1a3e; }
+  .cell.dark { background: #12122a; }
+
+  .cell.selected {
+    background: rgba(46, 204, 113, 0.35) !important;
+    box-shadow: inset 0 0 12px rgba(46, 204, 113, 0.3);
+  }
+
+  .cell.valid-move::after {
+    content: '';
+    width: 28%;
+    height: 28%;
+    background: rgba(46, 204, 113, 0.5);
+    border-radius: 50%;
+    position: absolute;
+    pointer-events: none;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .cell.valid-attack {
+    background: rgba(231, 76, 60, 0.15) !important;
+  }
+
+  .cell.valid-attack::after {
+    content: '';
+    width: 75%;
+    height: 75%;
+    background: transparent;
+    border: 3px solid rgba(231, 76, 60, 0.5);
+    border-radius: 50%;
+    position: absolute;
+    pointer-events: none;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  /* --- Robot pieces --- */
+  .robot {
+    width: 78%;
+    height: 78%;
+    border-radius: 18%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: transform 0.15s, box-shadow 0.15s;
+    z-index: 1;
+  }
+
+  .robot:active {
+    transform: scale(0.92);
+  }
+
+  .robot.player1 {
+    background: linear-gradient(145deg, #2980b9, #3498db);
+    border: 2px solid #1c6ea0;
+    box-shadow: 0 3px 10px rgba(52, 152, 219, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  .robot.player2 {
+    background: linear-gradient(145deg, #c0392b, #e74c3c);
+    border: 2px solid #a33025;
+    box-shadow: 0 3px 10px rgba(231, 76, 60, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+    transform: rotate(180deg);
+  }
+
+  .robot.player2:active {
+    transform: rotate(180deg) scale(0.92);
+  }
+
+  /* Robot face */
+  .robot-head {
+    width: 70%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12%;
+  }
+
+  .robot-eyes {
+    display: flex;
+    gap: 28%;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .robot-eye {
+    width: 26%;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 3px;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  }
+
+  .robot-mouth {
+    width: 45%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 2px;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+  }
+
+  /* Antenna */
+  .robot::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    width: 3px;
+    height: 8px;
+    background: #aaa;
+    border-radius: 1px;
+  }
+
+  .robot::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .robot.player1::after {
+    background: #2ecc71;
+    box-shadow: 0 0 8px #2ecc71;
+  }
+
+  .robot.player2::after {
+    background: #f39c12;
+    box-shadow: 0 0 8px #f39c12;
+  }
+
+  /* --- Overlay / Win screen --- */
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 100;
+    gap: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .overlay.show { display: flex; }
+
+  .overlay h1 {
+    font-size: 2em;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .overlay .winner-robot {
+    width: 80px;
+    height: 80px;
+    border-radius: 18%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .overlay .winner-robot.p1 {
+    background: linear-gradient(145deg, #2980b9, #3498db);
+    border: 3px solid #1c6ea0;
+    box-shadow: 0 0 30px rgba(52, 152, 219, 0.6);
+  }
+
+  .overlay .winner-robot.p2 {
+    background: linear-gradient(145deg, #c0392b, #e74c3c);
+    border: 3px solid #a33025;
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.6);
+  }
+
+  .overlay .winner-robot .big-eyes {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .overlay .winner-robot .big-eye {
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+  }
+
+  .overlay .winner-robot .big-mouth {
+    width: 30px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+  }
+
+  .btn {
+    padding: 14px 36px;
+    font-size: 1.1em;
+    font-weight: 700;
+    background: linear-gradient(145deg, #27ae60, #2ecc71);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    letter-spacing: 0.5px;
+  }
+
+  .btn:hover { transform: scale(1.05); }
+  .btn:active { transform: scale(0.95); }
+
+  /* Move animation */
+  .robot.moving {
+    transition: none;
+    animation: moveRobot 0.2s ease-out;
+  }
+
+  @keyframes moveRobot {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .robot.player2.moving {
+    animation: moveRobot2 0.2s ease-out;
+  }
+
+  @keyframes moveRobot2 {
+    0% { transform: rotate(180deg) scale(0.8); opacity: 0.5; }
+    100% { transform: rotate(180deg) scale(1); opacity: 1; }
+  }
+
+  /* Eliminated animation */
+  @keyframes eliminated {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="player-info top" id="player2-info">
+    <span class="status" id="p2-status">Väntar...</span>
+    <span>🔴 Spelare 2</span>
+    <div class="robots-left" id="p2-pips"></div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="player-info bottom" id="player1-info">
+    <div class="robots-left" id="p1-pips"></div>
+    <span>🔵 Spelare 1</span>
+    <span class="status" id="p1-status">Din tur!</span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="winner-robot" id="winner-robot">
+    <div class="big-eyes">
+      <div class="big-eye"></div>
+      <div class="big-eye"></div>
+    </div>
+    <div class="big-mouth"></div>
+  </div>
+  <h1 id="win-text"></h1>
+  <button class="btn" onclick="initGame()">Spela igen</button>
+</div>
+
+<script>
+const ROWS = 8;
+const COLS = 8;
+const ROBOTS_PER_PLAYER = 5;
+const START_COLS = [1, 2, 3, 4, 5]; // centered-ish on 8-wide board
+
+let grid = [];       // grid[row][col] = 0 (empty), 1 (player1), 2 (player2)
+let currentPlayer = 1;
+let selectedCell = null; // {row, col} or null
+let gameOver = false;
+let robotCounts = { 1: ROBOTS_PER_PLAYER, 2: ROBOTS_PER_PLAYER };
+
+const boardEl = document.getElementById('board');
+
+function initGame() {
+  // Reset state
+  grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+  currentPlayer = 1;
+  selectedCell = null;
+  gameOver = false;
+  robotCounts = { 1: ROBOTS_PER_PLAYER, 2: ROBOTS_PER_PLAYER };
+
+  // Place robots
+  for (const col of START_COLS) {
+    grid[0][col] = 2;  // Player 2 at top
+    grid[7][col] = 1;  // Player 1 at bottom
+  }
+
+  document.getElementById('overlay').classList.remove('show');
+  renderBoard();
+  updateUI();
+}
+
+function renderBoard() {
+  boardEl.innerHTML = '';
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement('div');
+      const isLight = (r + c) % 2 === 0;
+      cell.className = `cell ${isLight ? 'light' : 'dark'}`;
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+
+      // Selected highlight
+      if (selectedCell && selectedCell.row === r && selectedCell.col === c) {
+        cell.classList.add('selected');
+      }
+
+      // Valid move highlights
+      if (selectedCell) {
+        const moveType = getMoveType(selectedCell.row, selectedCell.col, r, c);
+        if (moveType === 'move') cell.classList.add('valid-move');
+        if (moveType === 'attack') cell.classList.add('valid-attack');
+      }
+
+      // Robot piece
+      if (grid[r][c] !== 0) {
+        const robot = createRobotElement(grid[r][c]);
+        cell.appendChild(robot);
+      }
+
+      cell.addEventListener('click', () => onCellClick(r, c));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function createRobotElement(player) {
+  const robot = document.createElement('div');
+  robot.className = `robot player${player}`;
+
+  const head = document.createElement('div');
+  head.className = 'robot-head';
+
+  const eyes = document.createElement('div');
+  eyes.className = 'robot-eyes';
+  eyes.innerHTML = '<div class="robot-eye"></div><div class="robot-eye"></div>';
+
+  const mouth = document.createElement('div');
+  mouth.className = 'robot-mouth';
+
+  head.appendChild(eyes);
+  head.appendChild(mouth);
+  robot.appendChild(head);
+
+  return robot;
+}
+
+function getValidMoves(row, col) {
+  const player = grid[row][col];
+  if (player === 0) return [];
+
+  const forwardDir = player === 1 ? -1 : 1; // P1 goes up, P2 goes down
+  const moves = [];
+
+  // Forward
+  const fr = row + forwardDir;
+  if (fr >= 0 && fr < ROWS) {
+    if (grid[fr][col] !== player) {
+      moves.push({ row: fr, col: col });
+    }
+  }
+
+  // Left
+  const lc = col - 1;
+  if (lc >= 0 && grid[row][lc] !== player) {
+    moves.push({ row: row, col: lc });
+  }
+
+  // Right
+  const rc = col + 1;
+  if (rc < COLS && grid[row][rc] !== player) {
+    moves.push({ row: row, col: rc });
+  }
+
+  return moves;
+}
+
+function getMoveType(fromRow, fromCol, toRow, toCol) {
+  const moves = getValidMoves(fromRow, fromCol);
+  const match = moves.find(m => m.row === toRow && m.col === toCol);
+  if (!match) return null;
+
+  const target = grid[toRow][toCol];
+  if (target !== 0 && target !== grid[fromRow][fromCol]) return 'attack';
+  if (target === 0) return 'move';
+  return null;
+}
+
+function onCellClick(row, col) {
+  if (gameOver) return;
+
+  // If a robot is already selected
+  if (selectedCell) {
+    const moveType = getMoveType(selectedCell.row, selectedCell.col, row, col);
+
+    if (moveType) {
+      // Execute move
+      executeMove(selectedCell.row, selectedCell.col, row, col, moveType);
+      return;
+    }
+
+    // Clicked on own robot — reselect
+    if (grid[row][col] === currentPlayer) {
+      selectedCell = { row, col };
+      renderBoard();
+      return;
+    }
+
+    // Clicked elsewhere — deselect
+    selectedCell = null;
+    renderBoard();
+    return;
+  }
+
+  // No selection yet — select own robot
+  if (grid[row][col] === currentPlayer) {
+    selectedCell = { row, col };
+    renderBoard();
+  }
+}
+
+function executeMove(fromRow, fromCol, toRow, toCol, moveType) {
+  const player = grid[fromRow][fromCol];
+  const opponent = player === 1 ? 2 : 1;
+
+  // If attacking, remove opponent robot
+  if (moveType === 'attack') {
+    robotCounts[opponent]--;
+  }
+
+  // Move robot
+  grid[toRow][toCol] = player;
+  grid[fromRow][fromCol] = 0;
+
+  selectedCell = null;
+
+  // Check win
+  if (robotCounts[opponent] === 0) {
+    gameOver = true;
+    renderBoard();
+    updateUI();
+    showWin(player);
+    return;
+  }
+
+  // Switch turn
+  currentPlayer = opponent;
+  renderBoard();
+  updateUI();
+
+  // Animate the moved robot
+  const cellIndex = toRow * COLS + toCol;
+  const cellEl = boardEl.children[cellIndex];
+  const robotEl = cellEl.querySelector('.robot');
+  if (robotEl) {
+    robotEl.classList.add('moving');
+    setTimeout(() => robotEl.classList.remove('moving'), 200);
+  }
+}
+
+function updateUI() {
+  const p1Info = document.getElementById('player1-info');
+  const p2Info = document.getElementById('player2-info');
+  const p1Status = document.getElementById('p1-status');
+  const p2Status = document.getElementById('p2-status');
+
+  p1Info.classList.toggle('active', currentPlayer === 1);
+  p2Info.classList.toggle('active', currentPlayer === 2);
+
+  p1Status.textContent = currentPlayer === 1 ? 'Din tur!' : 'Väntar...';
+  p2Status.textContent = currentPlayer === 2 ? 'Din tur!' : 'Väntar...';
+
+  // Update pips
+  updatePips('p1-pips', 1);
+  updatePips('p2-pips', 2);
+}
+
+function updatePips(containerId, player) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  for (let i = 0; i < ROBOTS_PER_PLAYER; i++) {
+    const pip = document.createElement('div');
+    pip.className = `pip${i >= robotCounts[player] ? ' lost' : ''}`;
+    container.appendChild(pip);
+  }
+}
+
+function showWin(player) {
+  const overlay = document.getElementById('overlay');
+  const winText = document.getElementById('win-text');
+  const winnerRobot = document.getElementById('winner-robot');
+
+  winnerRobot.className = `winner-robot ${player === 1 ? 'p1' : 'p2'}`;
+  winText.innerHTML = `Spelare ${player} vinner!`;
+
+  setTimeout(() => overlay.classList.add('show'), 400);
+}
+
+// Start!
+initGame();
+</script>
+</body>
+</html>
