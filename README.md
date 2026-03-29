@@ -1,4 +1,4 @@
-# Robotspelet
+# Robotspelet (Swedish)
 
 Ett turbaserat strategispel för två spelare, spelat på en delad skärm (surfplatta).
 
