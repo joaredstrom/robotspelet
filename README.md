@@ -13,7 +13,8 @@ Så här beskrev jag spelet:
 - Man **klickar på en robot** och sen på **dit den ska gå**
 - Man kan bara gå **en ruta i taget**, antingen **framåt** eller **åt sidan** — aldrig bakåt eller diagonalt
 - Man spelar **en tur i taget**, varannan spelare
-- Om en robot **går in i en motståndares robot** som står still, så **slås den ut**
+- Om en robot **går in i en motståndares robot** som står still, så **slås den ut** (med en liten explosion)
+- Om en robot går **framåt bortom motståndarens startruta**, kommer den tillbaka **på andra sidan brädet**
 - Den som har **slagit ut alla den andras robotar** först vinner
 - Roboten ska kunna **vända sig** (byta riktning), men det **kostar en tur**
 - Robotarna ska **peka åt det håll de tittar**
@@ -46,7 +47,11 @@ Om man klickar på en redan markerad robot **vrids den 90° medsols** och turen 
 
 ### Utslagning
 
-Om en robot flyttas till en ruta där en motståndare står, tas motståndaren bort. Antal kvarvarande robotar visas som små prickar i spelarfältet. När en spelare har 0 robotar kvar visas en vinstskärm.
+Om en robot flyttas till en ruta där en motståndare står, tas motståndaren bort med en liten explosionsanimation (partiklar och blixt). Antal kvarvarande robotar visas som små prickar i spelarfältet. När en spelare har 0 robotar kvar visas en vinstskärm.
+
+### Wrap-around
+
+Om en robot rör sig framåt och hamnar utanför brädet (bortom motståndarens startruta) så dyker den upp på andra sidan av brädet. Sidledsrörelse stoppas fortfarande av brädets kanter.
 
 ### Delad skärm
 

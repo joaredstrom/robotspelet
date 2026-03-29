@@ -398,6 +398,51 @@
     0% { opacity: 0.5; }
     100% { opacity: 1; }
   }
+
+  /* Explosion effect */
+  .explosion {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .explosion-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: explode 0.5s ease-out forwards;
+  }
+
+  @keyframes explode {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--tx), var(--ty)) scale(0);
+      opacity: 0;
+    }
+  }
+
+  .explosion-flash {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    top: 10%; left: 10%;
+    background: radial-gradient(circle, rgba(255,200,50,0.9), rgba(255,100,20,0.6), transparent 70%);
+    border-radius: 50%;
+    animation: flash 0.4s ease-out forwards;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  @keyframes flash {
+    0% { transform: scale(0.3); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
 </style>
 </head>
 <body>
@@ -557,6 +602,10 @@ function createRobotElement(player, dir) {
   return robot;
 }
 
+function wrapCoord(r, c) {
+  return { row: ((r % ROWS) + ROWS) % ROWS, col: ((c % COLS) + COLS) % COLS };
+}
+
 function getValidMoves(row, col) {
   const piece = grid[row][col];
   if (!piece) return [];
@@ -565,17 +614,14 @@ function getValidMoves(row, col) {
   const fwd = DIR_VECTORS[piece.dir];
   const sides = getSidewaysDirs(piece.dir);
 
-  // Forward
-  const fr = row + fwd[0];
-  const fc = col + fwd[1];
-  if (fr >= 0 && fr < ROWS && fc >= 0 && fc < COLS) {
-    const target = grid[fr][fc];
-    if (!target || target.player !== piece.player) {
-      moves.push({ row: fr, col: fc });
-    }
+  // Forward (wraps around the board)
+  const fw = wrapCoord(row + fwd[0], col + fwd[1]);
+  const fTarget = grid[fw.row][fw.col];
+  if (!fTarget || fTarget.player !== piece.player) {
+    moves.push(fw);
   }
 
-  // Sideways
+  // Sideways (no wrap — edges block sideways)
   for (const side of sides) {
     const sv = DIR_VECTORS[side];
     const sr = row + sv[0];
@@ -649,6 +695,39 @@ function rotateRobot(row, col) {
   updateUI();
 }
 
+function spawnExplosion(cellEl) {
+  const colors = ['#ff4', '#f72', '#f44', '#fa0', '#fff'];
+  const particleCount = 10;
+
+  // Flash
+  const flash = document.createElement('div');
+  flash.className = 'explosion-flash';
+  cellEl.appendChild(flash);
+
+  // Particles
+  for (let i = 0; i < particleCount; i++) {
+    const p = document.createElement('div');
+    p.className = 'explosion-particle';
+    const angle = (Math.PI * 2 * i) / particleCount;
+    const dist = 20 + Math.random() * 25;
+    const size = 3 + Math.random() * 5;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.top = '50%';
+    p.style.left = '50%';
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    p.style.animationDuration = (0.3 + Math.random() * 0.3) + 's';
+    cellEl.appendChild(p);
+  }
+
+  setTimeout(() => {
+    flash.remove();
+    cellEl.querySelectorAll('.explosion-particle').forEach(p => p.remove());
+  }, 600);
+}
+
 function executeMove(fromRow, fromCol, toRow, toCol, moveType) {
   const piece = grid[fromRow][fromCol];
   const opponent = piece.player === 1 ? 2 : 1;
@@ -665,6 +744,13 @@ function executeMove(fromRow, fromCol, toRow, toCol, moveType) {
     gameOver = true;
     renderBoard();
     updateUI();
+
+    // Explosion on the capture cell before showing win
+    if (moveType === 'attack') {
+      const cellEl = boardEl.children[toRow * COLS + toCol];
+      spawnExplosion(cellEl);
+    }
+
     showWin(piece.player);
     return;
   }
@@ -673,9 +759,15 @@ function executeMove(fromRow, fromCol, toRow, toCol, moveType) {
   renderBoard();
   updateUI();
 
-  // Animate
   const cellIndex = toRow * COLS + toCol;
   const cellEl = boardEl.children[cellIndex];
+
+  // Explosion on attack
+  if (moveType === 'attack') {
+    spawnExplosion(cellEl);
+  }
+
+  // Animate
   const robotEl = cellEl.querySelector('.robot');
   if (robotEl) {
     robotEl.classList.add('moving');
