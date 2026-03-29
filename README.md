@@ -70,3 +70,78 @@ Robotarna är byggda helt i HTML och CSS (inga bilder):
 - **Mage** — en mörkare panel med fyra runda skruvar
 - **Armar** — två rektanglar på sidorna, lätt vinklade nedåt, med små "händer" i änden
 - **Antenn** — en pinne med en lysande kula (grön för blå spelare, orange för röd)
+
+---
+
+# Robot Game (English)
+
+A turn-based strategy game for two players, played on a shared screen (tablet).
+
+## My instructions
+
+This is how I described the game:
+
+> I want a robot game that's like chess with 5 robots, you click on them and destroy each other. And the one who has a robot left last should win
+
+After some questions from the AI we agreed on these instructions:
+
+- It should be like a **chessboard** seen from above, **8x8 squares**
+- Each player has **5 robots**
+- You sit on **opposite sides of a tablet** and play
+- The robots start on **one row** at the bottom of each player's side
+- You **click on a robot** and then on **where it should go**
+- You can only move **one square at a time**, either **forward** or **sideways** — never backward or diagonally
+- Players take **one turn each**, alternating
+- If a robot **moves into an opponent's robot** that is standing still, it gets **knocked out** (with a small explosion)
+- If a robot moves **forward beyond the opponent's starting row**, it comes back **on the other side of the board**
+- The first player to **knock out all of the opponent's robots** wins
+- A robot can **turn** (change direction), but it **costs a turn**
+- Robots should **face the direction they are looking**
+- Player 2's side should be **rotated 180°** so both players can read from their side of the screen
+- **Minimalist** design but with a **nice robot style**
+- Robots should have **eyes, mouth, antenna, arms** (straight out and slightly downward) and a **belly with screws**
+
+## How the instructions became code
+
+The entire game is built as a single HTML file (`index.html`) with CSS and JavaScript — no frameworks or dependencies.
+
+### The board
+
+The board is an 8x8 CSS Grid. The squares alternate between dark shades (`#1a1a3e` and `#12122a`) for a tech feel instead of classic chess colors.
+
+### Robots and direction
+
+Each robot is stored in a grid (array) with which player it belongs to and **which direction it is facing** (`up`, `down`, `left`, `right`). The entire robot element is rotated with CSS `transform: rotate()` based on the direction. This makes the eyes and antenna always point where the robot "looks".
+
+Player 1 (blue) starts at the bottom and faces up. Player 2 (red) starts at the top and faces down.
+
+### Movement and turning
+
+Valid moves are calculated based on the robot's direction:
+- **Forward** = one step in the direction the robot is facing
+- **Sideways** = one step perpendicular to the facing direction
+- **Backward** = not allowed
+
+Clicking an already selected robot **rotates it 90° clockwise** and the turn passes to the opponent.
+
+### Elimination
+
+When a robot moves to a square where an opponent stands, the opponent is removed with a small explosion animation (particles and flash). Remaining robots are shown as small dots in the player bar. When a player has 0 robots left, a win screen is displayed.
+
+### Wrap-around
+
+If a robot moves forward and ends up outside the board (beyond the opponent's starting row), it appears on the other side of the board. Sideways movement is still blocked by the board edges.
+
+### Shared screen
+
+Player 2's info bar at the top is rotated 180° with CSS (`transform: rotate(180deg)`), so it can be read by a player sitting on the other side of a tablet. The board itself is fixed — both players interact by tapping on it from their side.
+
+### Robot design
+
+The robots are built entirely in HTML and CSS (no images):
+- **Body** — a rectangle with a gradient in the player's color (blue or red)
+- **Eyes** — two white squares with rounded corners
+- **Mouth** — a thin white line
+- **Belly** — a darker panel with four round screws
+- **Arms** — two rectangles on the sides, slightly angled downward, with small "hands" at the end
+- **Antenna** — a stick with a glowing orb (green for blue player, orange for red)
