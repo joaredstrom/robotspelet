@@ -389,6 +389,155 @@
   .btn:hover { transform: scale(1.05); }
   .btn:active { transform: scale(0.95); }
 
+  /* --- Intro screen --- */
+  .intro-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0a0a1a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    transition: opacity 0.6s ease;
+  }
+
+  .intro-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .intro-title {
+    font-size: clamp(2.5em, 10vw, 5em);
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+    position: relative;
+    animation: introGlitch 3s ease-in-out infinite;
+    text-shadow:
+      0 0 10px rgba(52, 152, 219, 0.8),
+      0 0 40px rgba(52, 152, 219, 0.4),
+      0 0 80px rgba(52, 152, 219, 0.2);
+  }
+
+  .intro-title::before,
+  .intro-title::after {
+    content: 'ROBOTSPELET';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  .intro-title::before {
+    color: #e74c3c;
+    animation: glitchLeft 2.5s ease-in-out infinite;
+    clip-path: inset(0 0 60% 0);
+  }
+
+  .intro-title::after {
+    color: #3498db;
+    animation: glitchRight 2.5s ease-in-out infinite;
+    clip-path: inset(60% 0 0 0);
+  }
+
+  @keyframes glitchLeft {
+    0%, 90%, 100% { transform: translate(0); }
+    92% { transform: translate(-4px, -2px); }
+    94% { transform: translate(3px, 1px); }
+    96% { transform: translate(-2px, 1px); }
+  }
+
+  @keyframes glitchRight {
+    0%, 90%, 100% { transform: translate(0); }
+    91% { transform: translate(3px, 2px); }
+    93% { transform: translate(-3px, -1px); }
+    95% { transform: translate(2px, -1px); }
+  }
+
+  @keyframes introGlitch {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+    51% { opacity: 0.9; }
+    52% { opacity: 1; }
+  }
+
+  .intro-byline {
+    font-size: clamp(0.9em, 3vw, 1.3em);
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 20px;
+    letter-spacing: 3px;
+    opacity: 0;
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .intro-robot {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeInUp 1s ease 0.4s forwards, introFloat 3s ease-in-out 1.4s infinite;
+  }
+
+  .intro-start {
+    margin-top: 50px;
+    font-size: 1em;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeInUp 1s ease 1.4s forwards, blink 2s ease-in-out 2.4s infinite;
+    cursor: pointer;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes introFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Scanlines effect */
+  .intro-scanlines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(0, 0, 0, 0.1) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Particles */
+  .intro-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    animation: particleDrift linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes particleDrift {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { opacity: 0; transform: translateY(-100vh); }
+  }
+
   /* Move animation */
   .robot.moving {
     animation: moveRobot 0.2s ease-out;
@@ -446,6 +595,14 @@
 </style>
 </head>
 <body>
+
+<div class="intro-screen" id="intro-screen">
+  <div class="intro-scanlines"></div>
+  <div class="intro-title">ROBOTSPELET</div>
+  <div class="intro-byline">gjort av Joar</div>
+  <div class="intro-robot" id="intro-robot"></div>
+  <div class="intro-start">TRYCK FÖR ATT STARTA</div>
+</div>
 
 <div class="game-container">
   <div class="player-info top" id="player2-info">
@@ -817,7 +974,47 @@ function showWin(player) {
   setTimeout(() => overlay.classList.add('show'), 400);
 }
 
-initGame();
+// --- Intro screen ---
+function setupIntro() {
+  const introScreen = document.getElementById('intro-screen');
+  const introRobot = document.getElementById('intro-robot');
+
+  // Create a robot for the intro
+  const robot = createRobotElement(1, 'up');
+  robot.style.width = '100%';
+  robot.style.height = '100%';
+  robot.style.transform = 'rotate(0deg)';
+  introRobot.appendChild(robot);
+
+  // Spawn floating particles
+  const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'];
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'intro-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.bottom = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (4 + Math.random() * 6) + 's';
+    p.style.animationDelay = (Math.random() * 5) + 's';
+    p.style.width = (2 + Math.random() * 3) + 'px';
+    p.style.height = p.style.width;
+    introScreen.appendChild(p);
+  }
+
+  // Start game on click/tap
+  introScreen.addEventListener('click', startGame);
+  introScreen.addEventListener('keydown', startGame);
+
+  function startGame() {
+    introScreen.removeEventListener('click', startGame);
+    introScreen.removeEventListener('keydown', startGame);
+    introScreen.classList.add('hidden');
+    setTimeout(() => introScreen.remove(), 700);
+    initGame();
+  }
+}
+
+setupIntro();
 </script>
 </body>
 </html>
