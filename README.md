@@ -6,7 +6,7 @@ Ett turbaserat strategispel för två spelare, spelat på en delad skärm (surfp
 
 Så här beskrev jag spelet:
 
-> Jag vill ha ett robotspel som är som shack med 5 robotar, man ska klicka på dom och så förstöra varandra.
+> Jag vill ha ett robotspel som är som shack med 5 robotar, man ska klicka på dom och så förstöra varandra. Och den som har en robot kvar sist ska vinna
 
 Efter lite frågor från AI kom vi fram till dessa instruktioner:
 
