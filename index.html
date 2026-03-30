@@ -538,6 +538,366 @@
     100% { opacity: 0; transform: translateY(-100vh); }
   }
 
+  /* --- Fly (Fluga) --- */
+  .fly-body {
+    width: 50%;
+    height: 55%;
+    position: absolute;
+    top: 30%;
+    left: 25%;
+    border-radius: 50% 50% 45% 45%;
+    background: #2a2a2a;
+    border: 1.5px solid #444;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+
+  .fly-head {
+    width: 32%;
+    height: 26%;
+    position: absolute;
+    top: 12%;
+    left: 34%;
+    border-radius: 50%;
+    background: #333;
+    border: 1.5px solid #444;
+    z-index: 2;
+  }
+
+  .fly-eye {
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e44, #900);
+    position: absolute;
+    top: 20%;
+    box-shadow: 0 0 4px rgba(255,50,50,0.5);
+  }
+
+  .fly-eye.left { left: -8%; }
+  .fly-eye.right { right: -8%; }
+
+  .fly-wing {
+    position: absolute;
+    width: 42%;
+    height: 55%;
+    top: 18%;
+    background: rgba(200, 220, 255, 0.25);
+    border: 1.5px solid rgba(200, 220, 255, 0.35);
+    border-radius: 50% 50% 40% 40%;
+    z-index: 0;
+    transform-origin: 50% 90%;
+    transition: transform 0.1s;
+  }
+
+  .fly-wing.left {
+    left: 2%;
+    transform: rotate(25deg);
+  }
+
+  .fly-wing.right {
+    right: 2%;
+    transform: rotate(-25deg);
+  }
+
+  /* Wing flapping animation */
+  .robot.moving .fly-wing.left,
+  .robot.fly-walking .fly-wing.left {
+    animation: flapLeft 0.08s ease-in-out 6;
+  }
+
+  .robot.moving .fly-wing.right,
+  .robot.fly-walking .fly-wing.right {
+    animation: flapRight 0.08s ease-in-out 6;
+  }
+
+  @keyframes flapLeft {
+    0%, 100% { transform: rotate(25deg) scaleY(1); }
+    50% { transform: rotate(55deg) scaleY(0.7); }
+  }
+
+  @keyframes flapRight {
+    0%, 100% { transform: rotate(-25deg) scaleY(1); }
+    50% { transform: rotate(-55deg) scaleY(0.7); }
+  }
+
+  .fly-leg {
+    position: absolute;
+    width: 8%;
+    height: 20%;
+    background: #333;
+    border-radius: 1px;
+    z-index: 1;
+  }
+
+  .fly-leg.fl { top: 42%; left: 10%; transform: rotate(25deg); }
+  .fly-leg.fr { top: 42%; right: 10%; transform: rotate(-25deg); }
+  .fly-leg.bl { top: 62%; left: 8%; transform: rotate(15deg); }
+  .fly-leg.br { top: 62%; right: 8%; transform: rotate(-15deg); }
+
+  /* Player marker on fly */
+  .fly-marker {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22%;
+    height: 8%;
+    border-radius: 2px;
+    z-index: 3;
+  }
+
+  .robot.p1 .fly-marker { background: #3498db; box-shadow: 0 0 4px rgba(52,152,219,0.6); }
+  .robot.p2 .fly-marker { background: #e74c3c; box-shadow: 0 0 4px rgba(231,76,60,0.6); }
+
+  /* --- Ladybug (Nyckelpiga) --- */
+  .ladybug-dome {
+    width: 60%;
+    height: 65%;
+    position: absolute;
+    top: 22%;
+    left: 20%;
+    border-radius: 50% 50% 45% 45%;
+    background: radial-gradient(ellipse at 40% 35%, #e53935, #c62828);
+    border: 1.5px solid #a11;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+    overflow: hidden;
+  }
+
+  /* Center line on dome */
+  .ladybug-dome::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: rgba(0,0,0,0.35);
+    transform: translateX(-50%);
+  }
+
+  .ladybug-spot {
+    position: absolute;
+    border-radius: 50%;
+    background: #1a1a1a;
+  }
+
+  .ladybug-spot.s1 { width: 22%; height: 18%; top: 20%; left: 12%; }
+  .ladybug-spot.s2 { width: 22%; height: 18%; top: 20%; right: 12%; }
+  .ladybug-spot.s3 { width: 18%; height: 15%; top: 50%; left: 18%; }
+  .ladybug-spot.s4 { width: 18%; height: 15%; top: 50%; right: 18%; }
+  .ladybug-spot.s5 { width: 16%; height: 13%; top: 72%; left: 30%; }
+  .ladybug-spot.s6 { width: 16%; height: 13%; top: 72%; right: 30%; }
+
+  .ladybug-head {
+    width: 28%;
+    height: 22%;
+    position: absolute;
+    top: 8%;
+    left: 36%;
+    border-radius: 50%;
+    background: #1a1a1a;
+    z-index: 2;
+  }
+
+  .ladybug-eye {
+    width: 32%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 25%;
+    box-shadow: 0 0 3px rgba(255,255,255,0.5);
+  }
+
+  .ladybug-eye.left { left: 5%; }
+  .ladybug-eye.right { right: 5%; }
+
+  .ladybug-antenna {
+    position: absolute;
+    width: 5%;
+    height: 14%;
+    background: #1a1a1a;
+    border-radius: 1px;
+    z-index: 3;
+  }
+
+  .ladybug-antenna.left {
+    top: 2%;
+    left: 38%;
+    transform: rotate(-15deg);
+  }
+
+  .ladybug-antenna.right {
+    top: 2%;
+    right: 38%;
+    transform: rotate(15deg);
+  }
+
+  .ladybug-antenna::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #1a1a1a;
+  }
+
+  .ladybug-leg {
+    position: absolute;
+    width: 7%;
+    height: 16%;
+    background: #1a1a1a;
+    border-radius: 1px;
+    z-index: 1;
+  }
+
+  .ladybug-leg.fl { top: 36%; left: 8%; transform: rotate(30deg); }
+  .ladybug-leg.fr { top: 36%; right: 8%; transform: rotate(-30deg); }
+  .ladybug-leg.ml { top: 52%; left: 6%; transform: rotate(15deg); }
+  .ladybug-leg.mr { top: 52%; right: 6%; transform: rotate(-15deg); }
+  .ladybug-leg.bl { top: 68%; left: 8%; transform: rotate(5deg); }
+  .ladybug-leg.br { top: 68%; right: 8%; transform: rotate(-5deg); }
+
+  /* Player marker on ladybug */
+  .ladybug-marker {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20%;
+    height: 6%;
+    border-radius: 2px;
+    z-index: 3;
+  }
+
+  .robot.p1 .ladybug-marker { background: #3498db; box-shadow: 0 0 4px rgba(52,152,219,0.6); }
+  .robot.p2 .ladybug-marker { background: #e74c3c; box-shadow: 0 0 4px rgba(231,76,60,0.6); }
+
+  /* --- Character select screen --- */
+  .character-select {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0a0a1a;
+    display: flex;
+    flex-direction: column;
+    z-index: 150;
+    transition: opacity 0.6s ease;
+  }
+
+  .character-select.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .char-select-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .char-select-panel.top-panel {
+    transform: rotate(180deg);
+    border-bottom: 2px solid rgba(231, 76, 60, 0.3);
+  }
+
+  .char-select-panel.bottom-panel {
+    border-top: 2px solid rgba(52, 152, 219, 0.3);
+  }
+
+  .char-select-title {
+    font-size: clamp(1em, 4vw, 1.4em);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .top-panel .char-select-title { color: #e74c3c; }
+  .bottom-panel .char-select-title { color: #3498db; }
+
+  .char-options {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .char-option {
+    width: 80px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 6px;
+  }
+
+  .char-option:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .char-option.selected-char {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.15);
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.3);
+  }
+
+  .char-option .char-preview {
+    width: 50px;
+    height: 50px;
+    position: relative;
+  }
+
+  .char-option .char-label {
+    font-size: 0.75em;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .char-select-ready {
+    margin-top: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .char-select-ready.visible { opacity: 1; }
+
+  .top-panel .char-select-ready { color: #e74c3c; }
+  .bottom-panel .char-select-ready { color: #3498db; }
+
+  .char-select-start {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    padding: 12px 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .char-select-start.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* Move animation */
   .robot.moving {
     animation: moveRobot 0.2s ease-out;
@@ -604,6 +964,20 @@
   <div class="intro-start">TRYCK FÖR ATT STARTA</div>
 </div>
 
+<div class="character-select" id="character-select">
+  <div class="char-select-panel top-panel" id="char-panel-2">
+    <div class="char-select-title">SPELARE 2 — VÄLJ FIGUR</div>
+    <div class="char-options" id="char-options-2"></div>
+    <div class="char-select-ready" id="char-ready-2">REDO!</div>
+  </div>
+  <button class="btn char-select-start" id="char-start-btn">SPELA!</button>
+  <div class="char-select-panel bottom-panel" id="char-panel-1">
+    <div class="char-select-title">SPELARE 1 — VÄLJ FIGUR</div>
+    <div class="char-options" id="char-options-1"></div>
+    <div class="char-select-ready" id="char-ready-1">REDO!</div>
+  </div>
+</div>
+
 <div class="game-container">
   <div class="player-info top" id="player2-info">
     <span class="status" id="p2-status">Väntar...</span>
@@ -623,7 +997,7 @@
 <div class="overlay" id="overlay">
   <div class="winner-robot-display" id="winner-robot-display"></div>
   <h1 id="win-text"></h1>
-  <button class="btn" onclick="initGame()">Spela igen</button>
+  <button class="btn" onclick="restartGame()">Spela igen</button>
 </div>
 
 <script>
@@ -656,6 +1030,11 @@ function getSidewaysDirs(facing) {
   if (facing === 'up' || facing === 'down') return ['left', 'right'];
   return ['up', 'down'];
 }
+
+// Character types
+const CHAR_TYPES = ['robot', 'fly', 'ladybug'];
+const CHAR_LABELS = { robot: 'Robot', fly: 'Fluga', ladybug: 'Nyckelpiga' };
+let playerCharacter = { 1: 'robot', 2: 'robot' };
 
 // grid[row][col] = null | { player: 1|2, dir: 'up'|'down'|'left'|'right' }
 let grid = [];
@@ -717,11 +1096,19 @@ function renderBoard() {
   }
 }
 
-function createRobotElement(player, dir) {
+function createRobotElement(player, dir, charType) {
+  charType = charType || playerCharacter[player] || 'robot';
   const robot = document.createElement('div');
   robot.className = `robot p${player}`;
   robot.style.transform = `rotate(${DIR_ROTATION[dir]}deg)`;
 
+  if (charType === 'fly') {
+    return createFlyElement(robot);
+  } else if (charType === 'ladybug') {
+    return createLadybugElement(robot);
+  }
+
+  // Default: Robot
   // Antenna
   const antenna = document.createElement('div');
   antenna.className = 'robot-antenna';
@@ -755,6 +1142,92 @@ function createRobotElement(player, dir) {
   body.appendChild(mouth);
   body.appendChild(belly);
   robot.appendChild(body);
+
+  return robot;
+}
+
+function createFlyElement(robot) {
+  // Wings
+  const wingL = document.createElement('div');
+  wingL.className = 'fly-wing left';
+  robot.appendChild(wingL);
+
+  const wingR = document.createElement('div');
+  wingR.className = 'fly-wing right';
+  robot.appendChild(wingR);
+
+  // Head
+  const head = document.createElement('div');
+  head.className = 'fly-head';
+  const eyeL = document.createElement('div');
+  eyeL.className = 'fly-eye left';
+  const eyeR = document.createElement('div');
+  eyeR.className = 'fly-eye right';
+  head.appendChild(eyeL);
+  head.appendChild(eyeR);
+  robot.appendChild(head);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'fly-body';
+  robot.appendChild(body);
+
+  // Legs
+  ['fl','fr','bl','br'].forEach(cls => {
+    const leg = document.createElement('div');
+    leg.className = 'fly-leg ' + cls;
+    robot.appendChild(leg);
+  });
+
+  // Player marker
+  const marker = document.createElement('div');
+  marker.className = 'fly-marker';
+  robot.appendChild(marker);
+
+  return robot;
+}
+
+function createLadybugElement(robot) {
+  // Antennae
+  const antL = document.createElement('div');
+  antL.className = 'ladybug-antenna left';
+  robot.appendChild(antL);
+  const antR = document.createElement('div');
+  antR.className = 'ladybug-antenna right';
+  robot.appendChild(antR);
+
+  // Head
+  const head = document.createElement('div');
+  head.className = 'ladybug-head';
+  const eyeL = document.createElement('div');
+  eyeL.className = 'ladybug-eye left';
+  const eyeR = document.createElement('div');
+  eyeR.className = 'ladybug-eye right';
+  head.appendChild(eyeL);
+  head.appendChild(eyeR);
+  robot.appendChild(head);
+
+  // Dome with spots
+  const dome = document.createElement('div');
+  dome.className = 'ladybug-dome';
+  ['s1','s2','s3','s4','s5','s6'].forEach(cls => {
+    const spot = document.createElement('div');
+    spot.className = 'ladybug-spot ' + cls;
+    dome.appendChild(spot);
+  });
+  robot.appendChild(dome);
+
+  // Legs
+  ['fl','fr','ml','mr','bl','br'].forEach(cls => {
+    const leg = document.createElement('div');
+    leg.className = 'ladybug-leg ' + cls;
+    robot.appendChild(leg);
+  });
+
+  // Player marker
+  const marker = document.createElement('div');
+  marker.className = 'ladybug-marker';
+  robot.appendChild(marker);
 
   return robot;
 }
@@ -928,6 +1401,12 @@ function executeMove(fromRow, fromCol, toRow, toCol, moveType) {
   const robotEl = cellEl.querySelector('.robot');
   if (robotEl) {
     robotEl.classList.add('moving');
+    // Extra wing flap for flies
+    const movedPlayer = grid[toRow][toCol] ? grid[toRow][toCol].player : null;
+    if (movedPlayer && playerCharacter[movedPlayer] === 'fly') {
+      robotEl.classList.add('fly-walking');
+      setTimeout(() => robotEl.classList.remove('fly-walking'), 500);
+    }
     setTimeout(() => robotEl.classList.remove('moving'), 200);
   }
 }
@@ -964,7 +1443,7 @@ function showWin(player) {
   const display = document.getElementById('winner-robot-display');
 
   display.innerHTML = '';
-  const robot = createRobotElement(player, 'up');
+  const robot = createRobotElement(player, 'up', playerCharacter[player]);
   robot.style.width = '100%';
   robot.style.height = '100%';
   robot.style.transform = 'rotate(0deg)';
@@ -1010,8 +1489,88 @@ function setupIntro() {
     introScreen.removeEventListener('keydown', startGame);
     introScreen.classList.add('hidden');
     setTimeout(() => introScreen.remove(), 700);
-    initGame();
+    setupCharacterSelect();
   }
+}
+
+function restartGame() {
+  document.getElementById('overlay').classList.remove('show');
+  // Recreate character select screen
+  const cs = document.createElement('div');
+  cs.className = 'character-select';
+  cs.id = 'character-select';
+  cs.innerHTML = `
+    <div class="char-select-panel top-panel" id="char-panel-2">
+      <div class="char-select-title">SPELARE 2 — VÄLJ FIGUR</div>
+      <div class="char-options" id="char-options-2"></div>
+      <div class="char-select-ready" id="char-ready-2">REDO!</div>
+    </div>
+    <button class="btn char-select-start" id="char-start-btn">SPELA!</button>
+    <div class="char-select-panel bottom-panel" id="char-panel-1">
+      <div class="char-select-title">SPELARE 1 — VÄLJ FIGUR</div>
+      <div class="char-options" id="char-options-1"></div>
+      <div class="char-select-ready" id="char-ready-1">REDO!</div>
+    </div>
+  `;
+  document.body.appendChild(cs);
+  setupCharacterSelect();
+}
+
+// --- Character select ---
+function setupCharacterSelect() {
+  const screen = document.getElementById('character-select');
+  const startBtn = document.getElementById('char-start-btn');
+  const selections = { 1: 'robot', 2: 'robot' };
+
+  [1, 2].forEach(p => {
+    const container = document.getElementById('char-options-' + p);
+    container.innerHTML = '';
+    CHAR_TYPES.forEach(type => {
+      const option = document.createElement('div');
+      option.className = 'char-option' + (type === 'robot' ? ' selected-char' : '');
+      option.dataset.type = type;
+
+      const preview = document.createElement('div');
+      preview.className = 'char-preview';
+      const fig = createRobotElement(p, 'up', type);
+      fig.style.width = '100%';
+      fig.style.height = '100%';
+      fig.style.transform = 'rotate(0deg)';
+      preview.appendChild(fig);
+
+      const label = document.createElement('div');
+      label.className = 'char-label';
+      label.textContent = CHAR_LABELS[type];
+
+      option.appendChild(preview);
+      option.appendChild(label);
+
+      option.addEventListener('click', () => {
+        selections[p] = type;
+        container.querySelectorAll('.char-option').forEach(o => o.classList.remove('selected-char'));
+        option.classList.add('selected-char');
+        document.getElementById('char-ready-' + p).classList.add('visible');
+        checkReady();
+      });
+
+      container.appendChild(option);
+    });
+    // Mark default as ready
+    document.getElementById('char-ready-' + p).classList.add('visible');
+  });
+
+  function checkReady() {
+    startBtn.classList.toggle('visible', true);
+  }
+  checkReady();
+
+  startBtn.addEventListener('click', () => {
+    playerCharacter[1] = selections[1];
+    playerCharacter[2] = selections[2];
+    screen.classList.add('hidden');
+    setTimeout(() => screen.remove(), 700);
+    initGame();
+  });
 }
 
 setupIntro();

@@ -26,6 +26,16 @@ Efter lite frågor från AI kom vi fram till dessa instruktioner:
 - **Minimalistisk** design men med **fin robotstil**
 - Robotarna ska ha **ögon, mun, antenn, armar** (rakt ut och lite nedåt) och **mage med skruvar**
 
+### Ny instruktion: Flugor och nyckelpigor
+
+> Nu vill jag att man ska kunna ändra robotarna till flugor och nyckelpigor. Flugorna ska röra på vingarna när dom går
+
+Efter lite frågor kom vi fram till:
+- Varje spelare **väljer sin egen figur** (robot, fluga eller nyckelpiga) innan spelet börjar
+- **Flugor** har stora röda fasettögon, genomskinliga vingar och ben — vingarna **fladdrar snabbt** när flugan rör sig
+- **Nyckelpigor** är klassiskt **röda med svarta prickar** och har en liten markering i spelarfärgen
+- En **figurväljarskärm** visas efter introt där varje spelare trycker på sin figur (Spelare 2:s val är roterat 180° precis som i spelet)
+
 ## Hur instruktionerna blev till kod
 
 Hela spelet är byggt som en enda HTML-fil (`index.html`) med CSS och JavaScript — inga ramverk eller beroenden.
@@ -71,6 +81,28 @@ Robotarna är byggda helt i HTML och CSS (inga bilder):
 - **Armar** — två rektanglar på sidorna, lätt vinklade nedåt, med små "händer" i änden
 - **Antenn** — en pinne med en lysande kula (grön för blå spelare, orange för röd)
 
+### Figurval
+
+Efter introskärmen visas en figurväljarskärm med två paneler (en för varje spelare, Spelare 2 roterad 180°). Varje spelare trycker på sin favoritfigur: Robot, Fluga eller Nyckelpiga. Valet sparas i `playerCharacter`-objektet och används av `createRobotElement()` för att rita rätt figur.
+
+### Flugan
+
+Flugan är byggd i HTML/CSS:
+- **Kropp** — mörk oval
+- **Huvud** — mindre cirkel med två stora **röda fasettögon**
+- **Vingar** — halvgenomskinliga ovala element som **fladdrar snabbt** (CSS animation `flapLeft`/`flapRight`) när flugan flyttas
+- **Ben** — fyra tunna streck
+- **Spelarmarkör** — en liten färgad remsa (blå/röd) under kroppen
+
+### Nyckelpigan
+
+Nyckelpigan är byggd i HTML/CSS:
+- **Kupol** — röd halvcirkel med sex **svarta prickar** och en mittlinje
+- **Huvud** — svart cirkel med vita ögon
+- **Antenner** — två svarta pinnar med kulor
+- **Ben** — sex tunna streck (tre per sida)
+- **Spelarmarkör** — en liten färgad remsa (blå/röd) under kupolen
+
 ---
 
 # Robot Game (English)
@@ -100,6 +132,16 @@ After some questions from the AI we agreed on these instructions:
 - Player 2's side should be **rotated 180°** so both players can read from their side of the screen
 - **Minimalist** design but with a **nice robot style**
 - Robots should have **eyes, mouth, antenna, arms** (straight out and slightly downward) and a **belly with screws**
+
+### New instruction: Flies and ladybugs
+
+> Now I want to be able to change the robots to flies and ladybugs. The flies should move their wings when they walk
+
+After some questions we agreed on:
+- Each player **picks their own character** (robot, fly or ladybug) before the game starts
+- **Flies** have big red compound eyes, translucent wings and legs — the wings **flutter quickly** when the fly moves
+- **Ladybugs** are classic **red with black spots** and have a small marker in the player's color
+- A **character selection screen** is shown after the intro where each player taps their character (Player 2's choices are rotated 180° just like in the game)
 
 ## How the instructions became code
 
@@ -145,3 +187,25 @@ The robots are built entirely in HTML and CSS (no images):
 - **Belly** — a darker panel with four round screws
 - **Arms** — two rectangles on the sides, slightly angled downward, with small "hands" at the end
 - **Antenna** — a stick with a glowing orb (green for blue player, orange for red)
+
+### Character selection
+
+After the intro screen, a character selection screen is shown with two panels (one per player, Player 2 rotated 180°). Each player taps their favorite character: Robot, Fly or Ladybug. The choice is stored in the `playerCharacter` object and used by `createRobotElement()` to render the correct character.
+
+### The fly
+
+The fly is built in HTML and CSS:
+- **Body** — dark oval
+- **Head** — smaller circle with two large **red compound eyes**
+- **Wings** — semi-transparent ovals that **flutter rapidly** (CSS animation `flapLeft`/`flapRight`) when the fly moves
+- **Legs** — four thin lines
+- **Player marker** — a small colored stripe (blue/red) below the body
+
+### The ladybug
+
+The ladybug is built in HTML and CSS:
+- **Dome** — a red half-circle with six **black spots** and a center line
+- **Head** — black circle with white eyes
+- **Antennae** — two black sticks with small orbs
+- **Legs** — six thin lines (three per side)
+- **Player marker** — a small colored stripe (blue/red) below the dome
